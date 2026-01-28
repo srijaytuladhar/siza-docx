@@ -1,21 +1,30 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, AfterViewInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, AfterViewInit, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { EditorService } from '../../services/editor.service';
 import { CommonModule } from '@angular/common';
+import { MermaidBlockComponent } from './mermaid-block.component';
 import { Block, BlockType } from '../../models/document.model';
 
 @Component({
     selector: 'app-block',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, MermaidBlockComponent],
     template: `
     <div class="block" [class]="'block-' + block.type">
-      <div #editable
-           contenteditable="true"
-           class="editable-area"
-           (input)="onInput()"
-           (keydown)="onKeyDown($event)"
-           (focus)="onFocus()"
-           [attr.placeholder]="getPlaceholder()">
-      </div>
+      @if (block.type === 'mermaid') {
+        <app-mermaid-block 
+          [code]="block.content" 
+          (codeChange)="editorService.updateBlock(block.id, $event)">
+        </app-mermaid-block>
+      } @else {
+        <div #editable
+             contenteditable="true"
+             class="editable-area"
+             (input)="onInput()"
+             (keydown)="onKeyDown($event)"
+             (focus)="onFocus()"
+             [attr.placeholder]="getPlaceholder()">
+        </div>
+      }
     </div>
   `,
     styles: `
@@ -63,6 +72,7 @@ import { Block, BlockType } from '../../models/document.model';
   `
 })
 export class BlockComponent implements AfterViewInit, OnChanges {
+    editorService = inject(EditorService);
     @Input() block!: Block;
     @Input() focused = false;
     @Output() update = new EventEmitter<string>();

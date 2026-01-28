@@ -99,6 +99,7 @@ export class CommandMenuComponent {
     { type: 'numbered-list', label: 'Numbered list', desc: 'Create a list with numbering.', icon: '1.' },
     { type: 'quote', label: 'Quote', desc: 'Capture a quotation.', icon: '\"' },
     { type: 'code', label: 'Code', desc: 'Capture a code snippet.', icon: '<>' },
+    { type: 'mermaid', label: 'Mermaid', desc: 'Flowcharts and diagrams.', icon: '📊' },
   ];
 
   selectedIndex = 0;
