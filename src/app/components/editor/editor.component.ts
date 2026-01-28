@@ -60,9 +60,13 @@ import { BlockType } from '../../models/document.model';
   `,
   styles: `
     .editor-container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 80px 100px;
+      max-width: 850px;
+      margin: 60px auto;
+      padding: 100px 100px;
+      background: white;
+      min-height: calc(100vh - 120px);
+      box-shadow: 0 10px 50px rgba(0,0,0,0.06);
+      border-radius: 8px;
     }
     .title-input {
       width: 100%;

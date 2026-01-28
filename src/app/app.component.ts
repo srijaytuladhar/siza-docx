@@ -4,10 +4,10 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { EditorComponent } from './components/editor/editor.component';
 
 @Component({
-    selector: 'app-root',
-    standalone: true,
-    imports: [CommonModule, SidebarComponent, EditorComponent],
-    template: `
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, SidebarComponent, EditorComponent],
+  template: `
     <div class="app-layout">
       <app-sidebar></app-sidebar>
       <main class="main-content">
@@ -15,7 +15,7 @@ import { EditorComponent } from './components/editor/editor.component';
       </main>
     </div>
   `,
-    styles: `
+  styles: `
     .app-layout {
       display: flex;
       height: 100vh;
@@ -26,7 +26,9 @@ import { EditorComponent } from './components/editor/editor.component';
       flex: 1;
       height: 100%;
       overflow-y: auto;
-      background: white;
+      background-color: #f8f9fa;
+      background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+      background-size: 25px 25px;
     }
   `
 })
