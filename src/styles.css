@@ -96,3 +96,87 @@ p {
     list-style-type: decimal;
     margin-left: 1.5em;
 }
+
+/* Export Button & UI */
+.export-actions {
+    position: fixed;
+    top: 24px;
+    right: 40px;
+    z-index: 100;
+    display: flex;
+    gap: 12px;
+}
+
+.secondary-btn {
+    padding: 8px 16px;
+    background: white;
+    color: var(--text-primary);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition-elegant);
+    box-shadow: var(--shadow-elegant);
+}
+
+.secondary-btn:hover {
+    background: #f8f9fa;
+    border-color: var(--text-secondary);
+    transform: translateY(-2px);
+}
+
+/* Print Styles */
+@media print {
+
+    app-sidebar,
+    .export-actions,
+    .control-actions,
+    .item-actions,
+    .delete-btn,
+    .empty-state {
+        display: none !important;
+    }
+
+    .app-layout {
+        display: block !important;
+        height: auto !important;
+        width: 100% !important;
+        overflow: visible !important;
+    }
+
+    .main-content {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .editor-container {
+        padding: 0 !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    .title-input {
+        font-size: 2.5rem !important;
+        margin-bottom: 2rem !important;
+    }
+
+    body {
+        background: white !important;
+    }
+
+    .mermaid-block {
+        break-inside: avoid;
+        border: none !important;
+    }
+
+    .block-code {
+        break-inside: avoid;
+    }
+}

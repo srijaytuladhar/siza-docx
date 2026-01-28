@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EditorService } from '../../services/editor.service';
 import { BlockComponent } from '../block/block.component';
@@ -11,7 +11,13 @@ import { BlockType } from '../../models/document.model';
   imports: [CommonModule, BlockComponent, CommandMenuComponent],
   template: `
     @if (editorService.activeDocument(); as doc) {
-      <div class="editor-container">
+      <div class="export-actions">
+        <button class="secondary-btn" (click)="exportToPDF()" [disabled]="isExporting()">
+          {{ isExporting() ? '⏳ Generating...' : '📥 Export PDF' }}
+        </button>
+      </div>
+
+      <div class="editor-container" #printSection>
         <input class="title-input" 
                [value]="doc.title" 
                (input)="onTitleInput($event)"
@@ -119,20 +125,20 @@ import { BlockType } from '../../models/document.model';
     }
     .hero-btn {
       padding: 16px 32px;
-      background: var(--accent-black);
+      background: linear-gradient(135deg, #d90429 0%, #8a1c22 100%);
       color: white;
       border: none;
       border-radius: 12px;
       font-size: 1.1rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
-      transition: var(--transition-smooth);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 10px 25px rgba(217, 4, 41, 0.2);
     }
     .hero-btn:hover {
-      background: var(--accent-red);
       transform: translateY(-4px);
-      box-shadow: 0 15px 30px rgba(217, 4, 41, 0.3);
+      box-shadow: 0 15px 35px rgba(217, 4, 41, 0.4);
+      filter: brightness(1.1);
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
@@ -142,11 +148,63 @@ import { BlockType } from '../../models/document.model';
 })
 export class EditorComponent {
   editorService = inject(EditorService);
+  @ViewChild('printSection') printSection!: ElementRef;
+
   focusedBlockId = signal<string | null>(null);
+  isExporting = signal(false);
 
   menuVisible = signal(false);
   menuPosition = { x: 0, y: 0 };
   private menuBlockId: string | null = null;
+
+  async exportToPDF() {
+    const doc = this.editorService.activeDocument();
+    if (!doc || !this.printSection) return;
+
+    this.isExporting.set(true);
+
+    try {
+      const { default: html2canvas } = await import('html2canvas');
+      const { jsPDF } = await import('jspdf');
+
+      const element = this.printSection.nativeElement;
+      const canvas = await html2canvas(element, {
+        scale: 2, // Higher quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      // Handle multi-page if needed
+      let heightLeft = pdfHeight;
+      let position = 0;
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - pdfHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`${doc.title || 'document'}.pdf`);
+    } catch (error) {
+      console.error('PDF Export Error:', error);
+      alert('Failed to export PDF. Please try using Browser Print (Ctrl+P).');
+    } finally {
+      this.isExporting.set(false);
+    }
+  }
 
   onTitleInput(event: any) {
     this.editorService.updateTitle(event.target.value);
